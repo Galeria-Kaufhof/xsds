@@ -1,0 +1,96 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <xs:complexType name="environmentType">
+        <xs:sequence>
+            <xs:element name="properties">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="configs">
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="cleanup.policy">
+                                        <xs:complexType>
+                                            <xs:choice minOccurs="1" maxOccurs="2">
+                                                <xs:element name="compact">
+                                                    <xs:complexType>
+                                                        <xs:attribute name="delete.retention.ms" type="xs:long" use="optional"/>
+                                                        <xs:attribute name="min.cleanable.dirty.ratio" type="xs:float" use="optional"/>
+                                                        <xs:attribute name="min.compaction.lag.ms" type="xs:long" use="optional"/>
+                                                    </xs:complexType>
+                                                </xs:element>
+                                                <xs:element name="delete">
+                                                    <xs:complexType>
+                                                        <xs:attribute name="retention.ms" type="xs:long" use="required"/>
+                                                    </xs:complexType>
+                                                </xs:element>
+                                            </xs:choice>
+                                        </xs:complexType>
+                                    </xs:element>
+                                    <xs:element name="message.format.version" type="xs:string" minOccurs="0"/>
+                                    <xs:element name="min.insync.replicas" type="xs:short"/>
+                                    <xs:element name="segment.ms" type="xs:long" minOccurs="0" nillable="true"/>
+                                    <xs:element name="unclean.leader.election.enable" type="xs:boolean" minOccurs="0" nillable="true"/>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                        <xs:element name="replication-factor" type="xs:short"/>
+                        <xs:element name="partitions" type="xs:int"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:sequence>
+        <xs:attribute name="name" type="xs:string" use="required" />
+    </xs:complexType>
+
+    <xs:element name="topic">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="name" type="xs:string"/>
+
+                <xs:element name="schema" minOccurs="0">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="key" type="schemaTypeDescriptorType" />
+                            <xs:element name="value" type="schemaTypeDescriptorType" />
+                        </xs:sequence>
+                        <xs:attribute name="type" type="xs:string" use="required" />
+                    </xs:complexType>
+                </xs:element>
+
+                <xs:element name="environments">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:choice>
+                                <xs:element name="environment" type="environmentType" minOccurs="0" maxOccurs="unbounded"/>
+                            </xs:choice>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:complexType name="sourceType">
+        <xs:choice>
+            <xs:element name="url" type="urlSourceType" />
+            <xs:element name="git" type="gitSourceType" />
+        </xs:choice>
+    </xs:complexType>
+
+    <xs:complexType name="schemaTypeDescriptorType">
+        <xs:sequence>
+            <xs:element name="source" type="sourceType" />
+        </xs:sequence>
+        <xs:attribute name="name" type="xs:string" />
+    </xs:complexType>
+
+    <xs:complexType name="urlSourceType">
+        <xs:attribute name="url" type="xs:anyURI" use="required" />
+    </xs:complexType>
+
+    <xs:complexType name="gitSourceType">
+        <xs:attribute name="repository" type="xs:string" use="required" />
+        <xs:attribute name="path" type="xs:string" use="required" />
+    </xs:complexType>
+
+</xs:schema>
